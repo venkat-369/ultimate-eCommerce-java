@@ -6,6 +6,9 @@ Welcome to the "Ultimate eCommerce Java" repository! This repository hosts a com
 [Live Demo](https://my-ecommerce-964f.onrender.com)
 - due to free plan, service may be down sometimes
 
+## Documentation
+[Documentation](https://drive.google.com/drive/folders/1CJZuhHHBzJp2DT9aPlmzTsyEgv83I1zX)
+
 ## Project Overview
 The "Ultimate eCommerce Java" project offers a rich set of features aimed at providing users with a seamless shopping experience. Here's a brief overview of its key components:
 
