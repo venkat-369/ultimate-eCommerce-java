@@ -16,17 +16,18 @@ pipeline {
         sh 'mvn clean package -DskipTests'
       }
     }
-    stage('Build Docker Image') {
-      steps {
-        sh "docker build -t chakriamajaladocker/${IMAGE_NAME}:${BUILD_NUMBER} ."
-      }
+   stage('Build Docker Image') {
+    steps {
+        sh 'docker build -t chakriamajaladocker/ultimate-ecommerce-java:${BUILD_NUMBER} .'
     }
-    stage('Push to Docker Hub') {
+}
+
+stage('Push to Docker Hub') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sh '''
                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                docker push chakriamajaladocker/ultimate-ecommerce-java:8
+                docker push chakriamajaladocker/ultimate-ecommerce-java:${BUILD_NUMBER}
             '''
         }
     }
