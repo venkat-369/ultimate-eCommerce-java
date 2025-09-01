@@ -1,47 +1,46 @@
 pipeline {
-  agent any
-  tools { maven 'maven3' }
-  environment {
-    DOCKER_CREDENTIALS = 'dockerhub-creds'
-    IMAGE_NAME = 'ultimate-ecommerce-java'
-  }
-  stages {
-    stage('Checkout') {
-      steps {
-        git 'https://github.com/ChakriAmajala/ultimate-eCommerce-java.git'
-      }
-    }
-    stage('Build & Package') {
-      steps {
-        sh 'mvn clean package -DskipTests'
-      }
-    }
-   stage('Build Docker Image') {
-    steps {
-        sh 'docker build -t chakriamajaladocker/ultimate-ecommerce-java:${BUILD_NUMBER} .'
-    }
-}
+    agent any
 
-stage('Push to Docker Hub') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-            sh '''
-                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                docker push chakriamajaladocker/ultimate-ecommerce-java:${BUILD_NUMBER}
-            '''
+    environment {
+        IMAGE_NAME = "ultimate-ecommerce-java"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/ChakriAmajala/ultimate-eCommerce-java.git'
+            }
+        }
+
+        stage('Build & Package') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker build -t $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} .
+                        docker push $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker tag $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} $DOCKER_USER/${IMAGE_NAME}:latest
+                        docker push $DOCKER_USER/${IMAGE_NAME}:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    docker stop ${IMAGE_NAME} || true
+                    docker rm ${IMAGE_NAME} || true
+                    docker run -d --name ${IMAGE_NAME} -p 8090:8080 $DOCKER_USER/${IMAGE_NAME}:latest
+                '''
+            }
         }
     }
-}
-
-    stage('Deploy') {
-      steps {
-        sh """
-          docker stop ${IMAGE_NAME} || true
-          docker rm ${IMAGE_NAME} || true
-          docker run -d --name ${IMAGE_NAME} -p 8090:8080 chakriamajaladocker/${IMAGE_NAME}:latest
-        """
-      }
-    }
-  }
 }
 
