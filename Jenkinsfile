@@ -26,7 +26,7 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sh '''
                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                docker push yourdockerhubid/ultimate-ecommerce-java:8
+                docker push chakriamajaladocker/ultimate-ecommerce-java:8
             '''
         }
     }
