@@ -1,6 +1,6 @@
 pipeline {
   agent any
-  tools { maven 'Maven-3.9.6' }
+  tools { maven 'Maven3' }
   environment {
     DOCKER_CREDENTIALS = 'dockerhub-creds'
     IMAGE_NAME = 'ultimate-ecommerce-java'
