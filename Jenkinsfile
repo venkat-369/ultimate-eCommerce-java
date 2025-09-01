@@ -37,7 +37,8 @@ pipeline {
                 sh '''
                     docker stop ${IMAGE_NAME} || true
                     docker rm ${IMAGE_NAME} || true
-                    docker run -d --name ${IMAGE_NAME} -p 8090:8080 $DOCKER_USER/${IMAGE_NAME}:latest
+                    docker run -d --name ultimate-ecommerce-java -p 8090:8080 chakriamajaladocker/ultimate-ecommerce-java:latest
+
                 '''
             }
         }
