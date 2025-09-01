@@ -18,7 +18,7 @@ pipeline {
     }
     stage('Build Docker Image') {
       steps {
-        sh "docker build -t yourdockerhubid/${IMAGE_NAME}:${BUILD_NUMBER} ."
+        sh "docker build -t chakriamajaladocker/${IMAGE_NAME}:${BUILD_NUMBER} ."
       }
     }
     stage('Push to Docker Hub') {
@@ -37,7 +37,7 @@ pipeline {
         sh """
           docker stop ${IMAGE_NAME} || true
           docker rm ${IMAGE_NAME} || true
-          docker run -d --name ${IMAGE_NAME} -p 8080:8080 yourdockerhubid/${IMAGE_NAME}:latest
+          docker run -d --name ${IMAGE_NAME} -p 8090:8080 chakriamajaladocker/${IMAGE_NAME}:latest
         """
       }
     }
