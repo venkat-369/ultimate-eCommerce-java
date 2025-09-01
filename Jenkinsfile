@@ -22,16 +22,16 @@ pipeline {
       }
     }
     stage('Push to Docker Hub') {
-      steps {
-        withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS,
-          usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-          sh "docker push yourdockerhubid/${IMAGE_NAME}:${BUILD_NUMBER}"
-          sh "docker tag yourdockerhubid/${IMAGE_NAME}:${BUILD_NUMBER} yourdockerhubid/${IMAGE_NAME}:latest"
-          sh "docker push yourdockerhubid/${IMAGE_NAME}:latest"
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            sh '''
+                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                docker push yourdockerhubid/ultimate-ecommerce-java:8
+            '''
         }
-      }
     }
+}
+
     stage('Deploy') {
       steps {
         sh """
