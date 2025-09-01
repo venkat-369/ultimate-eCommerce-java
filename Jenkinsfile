@@ -1,10 +1,6 @@
 pipeline {
   agent any
-<<<<<<< HEAD
-  tools { maven 'Maven3' }
-=======
-  tools { maven 'Maven-3' }
->>>>>>> 14ef891 (added js,dc)
+  tools { maven 'maven3' }
   environment {
     DOCKER_CREDENTIALS = 'dockerhub-creds'
     IMAGE_NAME = 'ultimate-ecommerce-java'
@@ -22,19 +18,16 @@ pipeline {
     }
     stage('Build Docker Image') {
       steps {
-        script {
-          def tag = "${env.BUILD_NUMBER}"
-          sh "docker build -t yourdockerhubid/${IMAGE_NAME}:${tag} ."
-        }
+        sh "docker build -t yourdockerhubid/${IMAGE_NAME}:${BUILD_NUMBER} ."
       }
     }
     stage('Push to Docker Hub') {
       steps {
         withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS,
-                         usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-          sh "docker push yourdockerhubid/${IMAGE_NAME}:${env.BUILD_NUMBER}"
-          sh "docker tag yourdockerhubid/${IMAGE_NAME}:${env.BUILD_NUMBER} yourdockerhubid/${IMAGE_NAME}:latest"
+          sh "docker push yourdockerhubid/${IMAGE_NAME}:${BUILD_NUMBER}"
+          sh "docker tag yourdockerhubid/${IMAGE_NAME}:${BUILD_NUMBER} yourdockerhubid/${IMAGE_NAME}:latest"
           sh "docker push yourdockerhubid/${IMAGE_NAME}:latest"
         }
       }
