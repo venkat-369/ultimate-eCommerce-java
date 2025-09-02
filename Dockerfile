@@ -1,21 +1,15 @@
-# Step 1: Build with Maven
+# Use OpenJDK base image
+FROM openjdk:17-jdk-slim
 
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Add a volume to store logs
+VOLUME /tmp
 
-WORKDIR /app
+# Copy the packaged jar file into the container
+COPY target/*.jar app.jar
 
-COPY pom.xml .
-
-COPY src ./src
-
-RUN mvn clean package -DskipTests
-
-# Step 2: Deploy with Tomcat
-FROM tomcat:9.0-jdk17
-
-COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
-
+# Expose application port
 EXPOSE 8080
 
-CMD ["catalina.sh", "run"]
+# Run the application
+ENTRYPOINT ["java","-jar","/app.jar"]
 

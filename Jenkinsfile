@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/ChakriAmajala/ultimate-eCommerce-java.git'
+                git branch: 'main', url: 'https://github.com/ChakriAmajala/ultimate-eCommerce-java.git'
             }
         }
 
@@ -18,7 +18,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Image & Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
@@ -37,8 +37,7 @@ pipeline {
                 sh '''
                     docker stop ${IMAGE_NAME} || true
                     docker rm ${IMAGE_NAME} || true
-                    docker run -d --name ultimate-ecommerce-java -p 8091:8080 chakriamajaladocker/ultimate-ecommerce-java:latest
-
+                    docker run -d --name ${IMAGE_NAME} -p 8091:8080 $DOCKER_USER/${IMAGE_NAME}:latest
                 '''
             }
         }
