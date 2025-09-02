@@ -6,7 +6,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 git 'https://github.com/ChakriAmajala/ultimate-eCommerce-java.git'
@@ -21,17 +20,12 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t chakriamajaladocker/${IMAGE_NAME}:${BUILD_NUMBER} .'
-                sh 'docker tag chakriamajaladocker/${IMAGE_NAME}:${BUILD_NUMBER} chakriamajaladocker/${IMAGE_NAME}:latest'
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker build -t $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} .
                         docker push $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker tag $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} $DOCKER_USER/${IMAGE_NAME}:latest
                         docker push $DOCKER_USER/${IMAGE_NAME}:latest
                     '''
                 }
@@ -40,13 +34,12 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        docker stop ${IMAGE_NAME} || true
-                        docker rm ${IMAGE_NAME} || true
-                        docker run -d --name ${IMAGE_NAME} -p 8090:8080 $DOCKER_USER/${IMAGE_NAME}:latest
-                    '''
-                }
+                sh '''
+                    docker stop ${IMAGE_NAME} || true
+                    docker rm ${IMAGE_NAME} || true
+                    docker run -d --name ultimate-ecommerce-java -p 8090:8080 chakriamajaladocker/ultimate-ecommerce-java:latest
+
+                '''
             }
         }
     }
