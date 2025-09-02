@@ -32,16 +32,15 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+    }        stage('Deploy') {
             steps {
                 sh '''
                     docker stop ${IMAGE_NAME} || true
                     docker rm ${IMAGE_NAME} || true
-                    docker run -d --name ultimate-ecommerce-java -p 8091:8080 /ultimate-ecommerce-java:latest
-
+                    docker run -d --name ${IMAGE_NAME} -p 8091:8080 chakriamajaladocker/${IMAGE_NAME}:latest
                 '''
             }
         }
-    }
-}
 
+  }
+}
