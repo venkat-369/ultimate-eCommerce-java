@@ -1,15 +1,12 @@
-# Use OpenJDK base image
-FROM openjdk:17-jdk-slim
+FROM tomcat:9.0-jdk17
 
-# Add a volume to store logs
-VOLUME /tmp
+# Remove default ROOT app
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Copy the packaged jar file into the container
-COPY target/*.jar app.war
+# Copy your war into Tomcat webapps as ROOT.war
+COPY target/*.war /usr/local/tomcat/webapps/ROOT.war
 
-# Expose application port
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java","-jar","/app.jar"]
+CMD ["catalina.sh", "run"]
 
