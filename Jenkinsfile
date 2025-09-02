@@ -32,7 +32,7 @@ pipeline {
             }
         }
 
-    }        stage('Deploy') {
+        stage('Deploy') {
             steps {
                 sh '''
                     docker stop ${IMAGE_NAME} || true
@@ -41,4 +41,6 @@ pipeline {
                 '''
             }
         }
-  }
+    }
+}
+
