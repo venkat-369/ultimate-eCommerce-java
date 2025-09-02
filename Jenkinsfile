@@ -1,53 +1,44 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "ultimate-ecommerce-java"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/ChakriAmajala/ultimate-eCommerce-java.git'
+                git branch: 'main', url: 'https://github.com/ChakriAmajala/ultimate-eCommerce-java.git'
             }
         }
 
-        stage('Build with Maven') {
+        stage('Build & Package') {
             steps {
-                sh 'mvn clean install -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Image & Push') {
             steps {
-                script {
-                    def IMAGE_NAME = "ultimate-ecommerce"
-                    def DOCKER_USER = "chakriamajala"
-
-                    sh "docker build -t ${DOCKER_USER}/${IMAGE_NAME}:latest ."
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    def IMAGE_NAME = "ultimate-ecommerce"
-                    def DOCKER_USER = "chakriamajala"
-
-                    withDockerRegistry([ credentialsId: 'dockerhub-credentials', url: '' ]) {
-                        sh "docker push ${DOCKER_USER}/${IMAGE_NAME}:latest"
-                    }
+                withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker build -t $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} .
+                        docker push $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker tag $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} $DOCKER_USER/${IMAGE_NAME}:latest
+                        docker push $DOCKER_USER/${IMAGE_NAME}:latest
+                    '''
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                script {
-                    def IMAGE_NAME = "ultimate-ecommerce"
-                    def DOCKER_USER = "chakriamajala"
-
-                    sh "docker rm -f ${IMAGE_NAME} || true"
-                    sh "docker run -d --name ${IMAGE_NAME} -p 8091:8080 ${DOCKER_USER}/${IMAGE_NAME}:latest"
-                }
+                sh '''
+                    docker stop ${IMAGE_NAME} || true
+                    docker rm ${IMAGE_NAME} || true
+                    docker run -d --name ${IMAGE_NAME} -p 8091:8080 chakriamajaladocker/${IMAGE_NAME}:latest
+                '''
             }
         }
     }
