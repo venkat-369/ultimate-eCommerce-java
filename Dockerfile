@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 VOLUME /tmp
 
 # Copy the packaged jar file into the container
-COPY target/*.jar app.jar
+COPY target/*.jar app.war
 
 # Expose application port
 EXPOSE 8080
