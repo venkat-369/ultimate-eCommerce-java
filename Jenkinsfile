@@ -18,19 +18,18 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image & Push') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker build -t $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} .
-                        docker push $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER}
-                        docker tag $DOCKER_USER/${IMAGE_NAME}:${BUILD_NUMBER} $DOCKER_USER/${IMAGE_NAME}:latest
-                        docker push $DOCKER_USER/${IMAGE_NAME}:latest
-                    '''
-                }
-            }
+      stage('Build Docker Image & Push') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'docker-hub1', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            sh '''
+                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                docker build -t $DOCKER_USER/ultimate-ecommerce-java:$BUILD_NUMBER .
+                docker push $DOCKER_USER/ultimate-ecommerce-java:$BUILD_NUMBER
+            '''
         }
+    }
+}
+
 
        stage('Deploy') {
     steps {
