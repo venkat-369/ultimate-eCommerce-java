@@ -42,7 +42,7 @@
 <distributionManagement>
         <repository>
             <id>maven-releases</id>
-            <url>http://13.233.166.119:8099/repository/maven-releases/</url>    --> give accorning to urs
+            <url>http://13.233.166.119:8099/repository/maven-releases/</url>    
         </repository>
         <snapshotRepository>
             <id>maven-snapshots</id>
